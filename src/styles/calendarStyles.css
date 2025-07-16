@@ -1,0 +1,27 @@
+/* src/styles/calendarStyles.css */
+
+.rbc-event {
+  background-color: #3b82f6 !important; /* Tailwind blue-500 */
+  color: white !important;
+  font-weight: 500;
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: none;
+}
+
+.rbc-today {
+  background-color: #fef3c7 !important; /* Tailwind yellow-100 */
+}
+
+.rbc-toolbar-label {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.rbc-day-bg {
+  background-color: #f9fafb; /* Tailwind gray-50 */
+}
+
+.rbc-off-range-bg {
+  background-color: #e5e7eb !important; /* Tailwind gray-200 */
+}
