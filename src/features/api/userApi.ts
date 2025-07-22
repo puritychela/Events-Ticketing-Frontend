@@ -32,14 +32,14 @@ export const userApi = createApi({
       }),
     }),
 
-    // CREATE USER (🆕 Admin-side create user)
+    // CREATE USER (Admin-side create)
     createUser: builder.mutation({
       query: (newUserData) => ({
         url: 'users',
         method: 'POST',
         body: newUserData,
       }),
-      invalidatesTags: ['users'], // 🔥 Ensures user list updates
+      invalidatesTags: ['users'],
     }),
 
     // GET USER BY ID
@@ -48,13 +48,13 @@ export const userApi = createApi({
       providesTags: (_result, _error, userId) => [{ type: 'user', id: userId }],
     }),
 
-    // GET ALL USERS
-    getAllUsersProfiles: builder.query({
+    // ✅ GET ALL USERS (renamed hook)
+    getAllUsers: builder.query({
       query: () => 'users',
       providesTags: ['users'],
     }),
 
-    // UPDATE USER PROFILE
+    // UPDATE USER
     updateUserProfile: builder.mutation({
       query: ({ userId, data }) => ({
         url: `users/${userId}`,
@@ -81,13 +81,13 @@ export const userApi = createApi({
   }),
 });
 
-// ✅ Export hooks
+// ✅ Export hooks (renamed `useGetAllUsersQuery`)
 export const {
   useLoginUserMutation,
   useRegisterUserMutation,
-  useCreateUserMutation, // 🆕
+  useCreateUserMutation,
   useGetUserByIdQuery,
-  useGetAllUsersProfilesQuery,
+  useGetAllUsersQuery, // renamed
   useUpdateUserProfileMutation,
   useDeleteUserProfileMutation,
 } = userApi;

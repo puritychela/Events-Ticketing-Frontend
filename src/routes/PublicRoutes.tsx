@@ -6,7 +6,7 @@ import { Login } from "../pages/Login";
 import Contact from "../pages/Contact";
 import About from "../pages/About";
 import { BrowseEvents } from "../pages/BrowseEvents";
-import PublicLayout from "../layouts/PublicLayout";
+import PublicLayout from "../Layouts/PublicLayout";
 
 const PublicRoutes = () => {
   return (

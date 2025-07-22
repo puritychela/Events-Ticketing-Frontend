@@ -1,10 +1,12 @@
-// src/api/eventsApi.ts
+// features/api/eventApi.ts
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type { Event } from '../../types/types';
 
 export const eventsApi = createApi({
-  reducerPath: 'eventsApi',
+  reducerPath: 'eventApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api',
+    baseUrl: 'http://localhost:5000/api/',
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('token');
       if (token) {
@@ -13,15 +15,58 @@ export const eventsApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ['events', 'event'],
   endpoints: (builder) => ({
-    // GET /api/events – fetch all events (public or protected)
+    // GET /events with optional filters
     getAllEvents: builder.query({
-      query: () => '/events',
+      query: (filters: Record<string, string> = {}) => {
+        const params = new URLSearchParams(filters).toString();
+        return `events${params ? `?${params}` : ''}`;
+      },
+      providesTags: ['events'],
     }),
 
-    // GET /api/events/:id – fetch event by ID
+    // GET /events/:id
     getEventById: builder.query({
-      query: (id: number) => `/events/${id}`,
+      query: (id: number) => `events/${id}`,
+      providesTags: (_res, _err, id) => [{ type: 'event', id }],
+    }),
+
+    // POST /events
+    createEvent: builder.mutation({
+      query: (newEvent) => ({
+        url: 'events',
+        method: 'POST',
+        body: newEvent,
+      }),
+      invalidatesTags: ['events'],
+    }),
+
+    // PUT /events/:id
+updateEvent: builder.mutation<Event, { eventId: number; updatedData: Event }>({
+  query: ({ eventId, updatedData }) => ({
+    url: `events/${eventId}`,
+    method: 'PUT',
+    body: updatedData,
+  }),
+  invalidatesTags: (_res, _err, { eventId }) => [
+    { type: 'event', id: eventId },
+    'events',
+  ],
+}),
+
+
+
+    // DELETE /events/:id
+    deleteEvent: builder.mutation({
+      query: (id: number) => ({
+        url: `events/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_res, _err, id) => [
+        { type: 'event', id },
+        'events',
+      ],
     }),
   }),
 });
@@ -29,4 +74,7 @@ export const eventsApi = createApi({
 export const {
   useGetAllEventsQuery,
   useGetEventByIdQuery,
+  useCreateEventMutation,
+  useUpdateEventMutation,
+  useDeleteEventMutation,
 } = eventsApi;

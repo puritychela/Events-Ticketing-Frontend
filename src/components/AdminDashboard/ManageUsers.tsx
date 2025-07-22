@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FiEdit, FiTrash, FiUserPlus } from "react-icons/fi";
 import Swal from "sweetalert2";
 import {
-  useGetAllUsersProfilesQuery,
+  useGetAllUsersQuery,
   useUpdateUserProfileMutation,
   useDeleteUserProfileMutation,
   useRegisterUserMutation,
@@ -21,7 +21,7 @@ interface User {
 }
 
 const ManageUsers = () => {
-  const { data: users = [], isLoading } = useGetAllUsersProfilesQuery("");
+  const { data: users = [], isLoading } = useGetAllUsersQuery("");
   const [updateUserProfile] = useUpdateUserProfileMutation();
   const [deleteUserProfile] = useDeleteUserProfileMutation();
   const [registerUser] = useRegisterUserMutation();

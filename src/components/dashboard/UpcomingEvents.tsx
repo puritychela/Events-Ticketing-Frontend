@@ -14,7 +14,7 @@ interface Event {
 }
 
 const UpcomingEvents = () => {
-  const { data: events, isLoading } = useGetAllEventsQuery("");
+  const { data: events, isLoading } = useGetAllEventsQuery(undefined);
   const [createBooking] = useCreateBookingMutation();
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated

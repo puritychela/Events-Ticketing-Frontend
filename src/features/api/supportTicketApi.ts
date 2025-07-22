@@ -30,6 +30,31 @@ export const supportTicketApi = createApi({
       providesTags: ['supportTickets'],
     }),
 
+    // GET ALL TICKETS (Admin)
+    getAllTickets: builder.query({
+      query: () => 'support',
+      providesTags: ['supportTickets'],
+    }),
+
+    // GET TICKET BY ID
+    getTicketById: builder.query({
+      query: (ticketId: number) => `support/${ticketId}`,
+      providesTags: (_res, _err, id) => [{ type: 'supportTicket', id }],
+    }),
+
+    // UPDATE TICKET
+    updateTicket: builder.mutation({
+      query: ({ ticketId, updates }) => ({
+        url: `support/${ticketId}`,
+        method: 'PUT',
+        body: updates,
+      }),
+      invalidatesTags: (_res, _err, { ticketId }) => [
+        { type: 'supportTicket', id: ticketId },
+        'supportTickets',
+      ],
+    }),
+
     // DELETE TICKET
     deleteTicket: builder.mutation({
       query: (ticketId: number) => ({
@@ -41,8 +66,12 @@ export const supportTicketApi = createApi({
   }),
 });
 
+// Export hooks
 export const {
   useCreateTicketMutation,
   useGetUserTicketsQuery,
+  useGetAllTicketsQuery,
+  useGetTicketByIdQuery,
+  useUpdateTicketMutation,
   useDeleteTicketMutation,
 } = supportTicketApi;

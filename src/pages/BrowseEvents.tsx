@@ -7,7 +7,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction'; // For click events
 
 export const BrowseEvents = () => {
-  const { data: events = [], isLoading, isError } = useGetAllEventsQuery('');
+  const { data: events = [], isLoading, isError } = useGetAllEventsQuery(undefined);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedVenue, setSelectedVenue] = useState('');

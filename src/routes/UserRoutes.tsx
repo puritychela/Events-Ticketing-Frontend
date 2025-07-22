@@ -6,7 +6,7 @@ import MyBookings from "../components/dashboard/MyBookings";
 import UpcomingEvents from "../components/dashboard/UpcomingEvents";
 import ProfileSettings from "../components/dashboard/UserProfile";
 import Support from "../components/dashboard/Support";
-import UserLayout from "../layouts/UserLayout";
+import UserLayout from "../Layouts/UserLayout";
 
 const UserRoutes = () => {
   return (
@@ -15,10 +15,11 @@ const UserRoutes = () => {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <UserLayout />
+            <UserLayout /> {/* 🟢 This is now the layout route with sidebar */}
           </ProtectedRoute>
         }
       >
+        {/* 🧩 These render inside <Outlet /> in UserLayout */}
         <Route index element={<Dashboard />} />
         <Route path="bookings" element={<MyBookings />} />
         <Route path="upcoming" element={<UpcomingEvents />} />

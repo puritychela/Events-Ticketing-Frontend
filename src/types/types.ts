@@ -2,10 +2,12 @@ import type { ReactNode } from "react";
 
 export type Event = {
   eventId: number;
-  title: string;              // ✅ used instead of "name"
+  title: string;
   description: string;
   venueId: number;
   category: string;
+  eventType?: string;
+  accessLevel?: string;
   date: string;
   time: string;
   ticketPrice: string;
@@ -15,7 +17,6 @@ export type Event = {
   createdAt: string;
   updatedAt: string;
 };
-
 
 export interface AuthState {
   user: null | any;
@@ -50,4 +51,16 @@ export interface Users {
   createdAt: string;
   updatedAt: string;
   profileUrl?: string;
+}
+// types/paymentTypes.ts
+export interface Payment {
+  paymentId: number;
+  bookingId: number;
+  amount: string;
+  paymentStatus: "Pending" | "Completed" | "Failed" | "Refunded";
+  paymentMethod: string;
+  transactionId: string;
+  paymentDate: string;
+  createdAt: string;
+  updatedAt: string;
 }
