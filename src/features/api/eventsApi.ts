@@ -43,7 +43,7 @@ export const eventsApi = createApi({
     }),
 
     // PUT /events/:id
-updateEvent: builder.mutation<Event, { eventId: number; updatedData: Event }>({
+updateEvent: builder.mutation<Event, { eventId: number; updatedData: Partial<Omit<Event, 'eventId' | 'createdAt' | 'updatedAt' | 'ticketsSold'>> }>({
   query: ({ eventId, updatedData }) => ({
     url: `events/${eventId}`,
     method: 'PUT',

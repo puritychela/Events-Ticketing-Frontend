@@ -1,13 +1,18 @@
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute";
+
+// Layout
+import AdminLayout from "../Layouts/AdminLayout";
+
+// Admin Pages
 import AdminDashboard from "../pages/AdminDashboard";
 import ManageUsers from "../components/AdminDashboard/ManageUsers";
-import {ManageEvents} from "../components/AdminDashboard/ManageEvents";
+import ManageEvents from "../components/AdminDashboard/ManageEvents";
 import Analytics from "../components/AdminDashboard/Analytics";
-import {ManageVenues} from "../components/AdminDashboard/ManageVenues";
-import {ManageTickets} from "../components/AdminDashboard/ManageSupportTicketing";
-import AdminUserProfile from "../components/AdminDashboard/AdminUserProfile"; // ✅ Import it
-import UserLayout from "../Layouts/UserLayout";
+import  { ManagePayments } from "../components/AdminDashboard/ManagePayment";
+import { ManageVenues } from "../components/AdminDashboard/ManageVenues";
+import { ManageTickets } from "../components/AdminDashboard/ManageSupportTicketing";
+import AdminUserProfile from "../components/AdminDashboard/AdminUserProfile";
 
 const AdminRoutes = () => {
   return (
@@ -16,17 +21,18 @@ const AdminRoutes = () => {
         path="/adminDashboard"
         element={
           <ProtectedRoute adminOnly={true}>
-            <UserLayout />
+            <AdminLayout />
           </ProtectedRoute>
         }
       >
         <Route index element={<AdminDashboard />} />
         <Route path="users" element={<ManageUsers />} />
         <Route path="events" element={<ManageEvents />} />
-        <Route path="analytics" element={<Analytics />} />
         <Route path="venues" element={<ManageVenues />} />
         <Route path="supportTicketing" element={<ManageTickets />} />
-        <Route path="profile" element={<AdminUserProfile />} /> {/* ✅ Add this line */}
+        <Route path="analytics" element={<Analytics />} />
+        <Route path="ManagePayments" element={<ManagePayments />} />
+        <Route path="profile" element={<AdminUserProfile />} />
       </Route>
     </Routes>
   );

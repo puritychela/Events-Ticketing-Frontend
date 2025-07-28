@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+// Event type
 export type Event = {
   eventId: number;
   title: string;
@@ -18,6 +19,7 @@ export type Event = {
   updatedAt: string;
 };
 
+// Auth state
 export interface AuthState {
   user: null | any;
   token: string | null;
@@ -25,6 +27,7 @@ export interface AuthState {
   userType: string | null;
 }
 
+// Booking details
 export interface BookingDetails {
   bookingId: number;
   eventId: number;
@@ -34,7 +37,7 @@ export interface BookingDetails {
   bookingStatus: string;
   createdAt: string;
   event: {
-    name: ReactNode;
+    name?: ReactNode;
     title: string;
     date: string;
     location: string;
@@ -42,21 +45,23 @@ export interface BookingDetails {
   };
 }
 
+// Users
 export interface Users {
   id: number;
   firstName: string;
   lastName: string;
   email: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
   createdAt: string;
   updatedAt: string;
   profileUrl?: string;
 }
-// types/paymentTypes.ts
+
+// Payments
 export interface Payment {
   paymentId: number;
   bookingId: number;
-  amount: string;
+  amount: number;
   paymentStatus: "Pending" | "Completed" | "Failed" | "Refunded";
   paymentMethod: string;
   transactionId: string;

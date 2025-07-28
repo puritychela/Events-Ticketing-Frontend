@@ -6,6 +6,7 @@ import { userApi } from '../features/api/userApi';
 import { supportTicketApi } from '../features/api/supportTicketApi';
 import { venueApi } from '../features/api/venueApi';
 import { paymentApi } from '../features/api/paymentApi';
+import { ticketApi } from '../features/api/ticketsApi';
 
 export const store = configureStore({
   reducer: {
@@ -15,11 +16,12 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [supportTicketApi.reducerPath]:supportTicketApi.reducer,
     [venueApi.reducerPath]:venueApi.reducer,
-    [paymentApi.reducerPath]:paymentApi.reducer
+    [paymentApi.reducerPath]:paymentApi.reducer,
+    [ticketApi.reducerPath]:ticketApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
-      .concat(eventsApi.middleware,bookingApi.middleware,userApi.middleware,supportTicketApi.middleware,venueApi.middleware,paymentApi.middleware)
+      .concat(eventsApi.middleware,bookingApi.middleware,userApi.middleware,supportTicketApi.middleware,venueApi.middleware,paymentApi.middleware,ticketApi.middleware)
       
 });
 

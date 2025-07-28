@@ -4,9 +4,13 @@ import EventCard from '../components/EventsCard';
 import { type Event } from '../types/types';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction'; // For click events
+import interactionPlugin from '@fullcalendar/interaction';
 
-export const BrowseEvents = () => {
+interface BrowseEventsProps {
+  onBook?: (eventId: number, amount: number) => void;
+}
+
+export const BrowseEvents = ({ onBook }: BrowseEventsProps) => {
   const { data: events = [], isLoading, isError } = useGetAllEventsQuery(undefined);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -45,7 +49,7 @@ export const BrowseEvents = () => {
 
   return (
     <div className="bg-gray-700 min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-4">Browse Events</h1>
+      <h1 className="text-2xl font-bold mb-4 text-white">Browse Events</h1>
 
       {/* View toggle */}
       <div className="flex gap-4 mb-4">
@@ -101,15 +105,15 @@ export const BrowseEvents = () => {
       </div>
 
       {/* Status Messages */}
-      {isLoading && <p>Loading events...</p>}
-      {isError && <p>Failed to load events.</p>}
-      {!isLoading && filteredEvents.length === 0 && <p>No events found.</p>}
+      {isLoading && <p className="text-white">Loading events...</p>}
+      {isError && <p className="text-red-400">Failed to load events.</p>}
+      {!isLoading && filteredEvents.length === 0 && <p className="text-gray-300">No events found.</p>}
 
       {/* Render View */}
       {viewMode === 'cards' ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredEvents.map((event: Event) => (
-            <EventCard key={event.eventId} event={event} />
+            <EventCard key={event.eventId} event={event} onBook={onBook} />
           ))}
         </div>
       ) : (

@@ -6,6 +6,8 @@ import { Login } from "../pages/Login";
 import Contact from "../pages/Contact";
 import About from "../pages/About";
 import { BrowseEvents } from "../pages/BrowseEvents";
+import PayNowPage from "../pages/PayNowPage"; // <-- Make sure this exists
+import TicketPage from "../pages/TicketPage"; // <-- Make sure this exists
 import PublicLayout from "../Layouts/PublicLayout";
 
 const PublicRoutes = () => {
@@ -18,6 +20,8 @@ const PublicRoutes = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/events" element={<BrowseEvents />} />
+        <Route path="/pay-now" element={<PayNowPage />} />
+        <Route path="/ticket" element={<TicketPage />} />
       </Route>
     </Routes>
   );

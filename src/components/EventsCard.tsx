@@ -1,3 +1,5 @@
+// src/components/EventCard.tsx
+
 import type { FC } from 'react';
 
 export type Event = {
@@ -20,6 +22,7 @@ export type Event = {
 
 type Props = {
   event: Event;
+  onBook?: (eventId: number, amount: number) => void;
 };
 
 const getTypeBadgeColor = (type?: string): string => {
@@ -50,7 +53,14 @@ const getAccessBadgeColor = (access?: string): string => {
   }
 };
 
-const EventCard: FC<Props> = ({ event }) => {
+const EventCard: FC<Props> = ({ event, onBook }) => {
+  const handleBookClick = () => {
+    if (onBook) {
+      const price = parseFloat(event.ticketPrice);
+      onBook(event.eventId, price);
+    }
+  };
+
   return (
     <div className="card bg-base-100 shadow-md hover:shadow-lg transition">
       {/* Image */}
@@ -66,7 +76,7 @@ const EventCard: FC<Props> = ({ event }) => {
       <div className="card-body p-4">
         <h2 className="card-title text-lg font-semibold">{event.title}</h2>
 
-        {/* Event Type & Access Level Badges */}
+        {/* Type & Access Level Badges */}
         <div className="flex items-center gap-2 mt-1 mb-2">
           {event.eventType && (
             <span className={`badge ${getTypeBadgeColor(event.eventType)}`}>
@@ -84,9 +94,7 @@ const EventCard: FC<Props> = ({ event }) => {
           {new Date(event.date).toLocaleDateString()} at {event.time}
         </p>
 
-        <p className="text-sm text-gray-600">
-          Category: {event.category}
-        </p>
+        <p className="text-sm text-gray-600">Category: {event.category}</p>
 
         <p className="text-sm text-gray-600">
           Tickets: {event.ticketsSold}/{event.ticketsTotal}
@@ -98,9 +106,16 @@ const EventCard: FC<Props> = ({ event }) => {
           KES {parseFloat(event.ticketPrice).toFixed(2)}
         </p>
 
-        <div className="card-actions mt-3">
-          <button className="btn btn-primary btn-sm w-full">Book Now</button>
-        </div>
+        {onBook && (
+          <div className="card-actions mt-3">
+            <button
+              className="btn btn-primary btn-sm w-full"
+              onClick={handleBookClick}
+            >
+              Book Now
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

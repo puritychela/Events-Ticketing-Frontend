@@ -1,21 +1,28 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../../app/store'; // Adjust path as needed
+import type { ReactNode } from 'react';
 
 // Define types if needed
 interface Booking {
+  totalAmount: ReactNode;
+  createdAt: string | number | Date;
+  message: string;
+  quantity: ReactNode;
+  amount: number;
   created_at: string | number | Date;
-  bookingId: Key | null | undefined;
+  bookingId: number;
   event: any;
   bookingStatus: string;
   id: number;
-  event_id: number;
+  eventId: number;
   user_id: number;
   status: string;
   // Add other relevant fields
 }
 
 interface CreateBookingPayload {
-  event_id: number;
+  eventId: number;
+  quantity: number;
   // Add other booking creation fields
 }
 

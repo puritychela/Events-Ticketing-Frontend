@@ -1,4 +1,3 @@
-// routes/UserRoutes.tsx
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Dashboard from "../pages/Dashboard";
@@ -15,11 +14,10 @@ const UserRoutes = () => {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <UserLayout /> {/* 🟢 This is now the layout route with sidebar */}
+            <UserLayout />
           </ProtectedRoute>
         }
       >
-        {/* 🧩 These render inside <Outlet /> in UserLayout */}
         <Route index element={<Dashboard />} />
         <Route path="bookings" element={<MyBookings />} />
         <Route path="upcoming" element={<UpcomingEvents />} />

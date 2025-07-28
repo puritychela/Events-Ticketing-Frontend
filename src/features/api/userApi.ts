@@ -1,3 +1,4 @@
+// src/services/userApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const userApi = createApi({
@@ -14,52 +15,62 @@ export const userApi = createApi({
   }),
   tagTypes: ['users', 'user'],
   endpoints: (builder) => ({
-    // LOGIN
+    // 🔐 LOGIN
     loginUser: builder.mutation({
-      query: (userLoginCredentials) => ({
+      query: (credentials) => ({
         url: 'auth/login',
         method: 'POST',
-        body: userLoginCredentials,
+        body: credentials,
       }),
     }),
 
-    // REGISTER
+    // 🔐 REGISTER
     registerUser: builder.mutation({
-      query: (userRegisterPayload) => ({
+      query: (payload) => ({
         url: 'auth/register',
         method: 'POST',
-        body: userRegisterPayload,
+        body: payload,
       }),
     }),
 
-    // CREATE USER (Admin-side create)
+    // 🧑‍💻 CREATE USER (Admin)
     createUser: builder.mutation({
-      query: (newUserData) => ({
+      query: (newUser) => ({
         url: 'users',
         method: 'POST',
-        body: newUserData,
+        body: newUser,
       }),
       invalidatesTags: ['users'],
     }),
 
-    // GET USER BY ID
+    // 📥 GET USER BY ID
     getUserById: builder.query({
-      query: (userId: number) => `users/${userId}`,
+      query: (userId: number | string) => `users/${userId}`,
       providesTags: (_result, _error, userId) => [{ type: 'user', id: userId }],
     }),
 
-    // ✅ GET ALL USERS (renamed hook)
+    // 📋 GET ALL USERS
     getAllUsers: builder.query({
       query: () => 'users',
       providesTags: ['users'],
     }),
 
-    // UPDATE USER
+    // 🛠️ UPDATE USER (Admin or profile)
     updateUserProfile: builder.mutation({
-      query: ({ userId, data }) => ({
+      query: ({ userId, ...patch }) => ({
         url: `users/${userId}`,
         method: 'PUT',
-        body: data,
+        body: patch,
+      }),
+      invalidatesTags: ['users'],
+    }),
+
+    // 🖼️ UPDATE PROFILE PICTURE
+    updateProfilePicture: builder.mutation({
+      query: ({ userId, formData }) => ({
+        url: `users/${userId}/profile_picture`,
+        method: 'PUT',
+        body: formData,
       }),
       invalidatesTags: (_result, _error, { userId }) => [
         { type: 'user', id: userId },
@@ -67,9 +78,9 @@ export const userApi = createApi({
       ],
     }),
 
-    // DELETE USER
+    // 🗑️ DELETE USER
     deleteUserProfile: builder.mutation({
-      query: (userId: number) => ({
+      query: (userId: number | string) => ({
         url: `users/${userId}`,
         method: 'DELETE',
       }),
@@ -81,13 +92,14 @@ export const userApi = createApi({
   }),
 });
 
-// ✅ Export hooks (renamed `useGetAllUsersQuery`)
+// ✅ Export RTK hooks
 export const {
   useLoginUserMutation,
   useRegisterUserMutation,
   useCreateUserMutation,
   useGetUserByIdQuery,
-  useGetAllUsersQuery, // renamed
+  useGetAllUsersQuery,
   useUpdateUserProfileMutation,
+  useUpdateProfilePictureMutation, // 👈 new
   useDeleteUserProfileMutation,
 } = userApi;

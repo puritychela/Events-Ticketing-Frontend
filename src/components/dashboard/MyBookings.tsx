@@ -1,128 +1,181 @@
-// import { FiEdit } from "react-icons/fi";
-// import { useSelector } from "react-redux";
-// import type { RootState } from "../../app/store";
-// import { PuffLoader } from "react-spinners";
-// import Swal from "sweetalert2";
-// import { bookingApi } from "../../features/api/bookingApi";
-// import type { BookingDetails } from "../../types/types";
+import { useGetMyBookingsQuery, useUpdateBookingMutation } from "../../features/api/bookingApi";
+import { PuffLoader } from "react-spinners";
+import { FiEdit } from "react-icons/fi";
+import Swal from "sweetalert2";
+import type { BookingDetails } from "../../types/types";
 
-// export const MyBookings = () => {
-//   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth.user);
-//   const userId = user?.userId;
-
-//   const [updateBooking] = bookingApi.useCreateBookingMutation();
-
-//   const { data: bookings = [], isLoading, error } = bookingApi.useGetBookingsByUserQuery(userId, {
-//     skip: !isAuthenticated,
-//   });
-
-//   const getStatusBadge = (status: string) => {
-//     switch (status) {
-//       case "confirmed": return "badge-success";
-//       case "canceled": return "badge-error";
-//       case "pending": return "badge-warning";
-//       default: return "badge-primary";
-//     }
-//   };
-
-//   const handleCancelBooking = async (bookingId: number) => {
-//     Swal.fire({
-//       title: "Are you sure?",
-//       text: "You want to cancel this booking?",
-//       icon: "question",
-//       showCancelButton: true,
-//       confirmButtonColor: "#2563eb",
-//       cancelButtonColor: "#f44336",
-//       confirmButtonText: "Yes, cancel it!",
-//     }).then(async (result) => {
-//       if (result.isConfirmed) {
-//         try {
-//           const payload = { bookingId, bookingStatus: "canceled" };
-//           const res = await updateBooking(payload).unwrap();
-//           Swal.fire("Canceled!", res.message, "success");
-//         } catch (err) {
-//           Swal.fire("Error", "Failed to cancel booking", "error");
-//         }
-//       }
-//     });
-//   };
-
-//   return (
-//     <>
-//       <div className="text-2xl font-bold text-center mb-4 text-blue-500">My Bookings</div>
-//       <div className="overflow-x-auto">
-//         <table className="table">
-//           <thead>
-//             <tr>
-//               <th>#</th>
-//               <th>Event</th>
-//               <th>Date</th>
-//               <th>Booked On</th>
-//               <th>Status</th>
-//               <th>Action</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {error ? (
-//               <tr><td colSpan={6}>Failed to fetch bookings</td></tr>
-//             ) : isLoading ? (
-//               <tr><td colSpan={6}><PuffLoader /></td></tr>
-//             ) : bookings.length === 0 ? (
-//               <tr><td colSpan={6}>No bookings available</td></tr>
-//             ) : (
-//               bookings.map((booking: BookingDetails) => (
-//                 <tr key={booking.bookingId}>
-//                   <td>{booking.bookingId}</td>
-//                   <td>
-//                     <div className="flex items-center gap-3">
-//                       <img src={booking.event.image} alt={booking.event.title} className="w-12 h-12 rounded" />
-//                       <div>
-//                         <div className="font-bold">{booking.event.title}</div>
-//                         <div className="text-sm opacity-70">{booking.event.location}</div>
-//                       </div>
-//                     </div>
-//                   </td>
-//                   <td>{booking.event.date}</td>
-//                   <td>{booking.createdAt}</td>
-//                   <td>
-//                     <div className={`badge badge-outline ${getStatusBadge(booking.bookingStatus)}`}>
-//                       {booking.bookingStatus}
-//                     </div>
-//                   </td>
-//                   <td>
-//                     <button className="btn btn-sm btn-outline text-blue-600 hover:text-blue-400"
-//                       onClick={() => handleCancelBooking(booking.bookingId)}>
-//                       <FiEdit />
-//                     </button>
-//                   </td>
-//                 </tr>
-//               ))
-//             )}
-//           </tbody>
-//         </table>
-//       </div>
-//     </>
-//   );
-// };
-// import React from 'react';
-import { useGetMyBookingsQuery } from '../../features/api/bookingApi';
+const IMAGE_BASE_URL = "http://localhost:5173/uploads"; // Update as needed for production
 
 const MyBookings = () => {
-  const { data: bookings, isLoading } = useGetMyBookingsQuery();
+  const { data: bookings = [], isLoading, error } = useGetMyBookingsQuery();
+  const [updateBooking] = useUpdateBookingMutation();
 
-  if (isLoading) return <p>Loading your bookings...</p>;
+  const getStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "confirmed":
+        return "badge-success";
+      case "cancelled":
+        return "badge-error";
+      case "pending":
+        return "badge-warning";
+      default:
+        return "badge-primary";
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: number) => {
+    Swal.fire({
+      title: "Cancel Booking?",
+      text: "This will cancel your reservation.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, cancel it!",
+      confirmButtonColor: "#d33",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await updateBooking({
+            id: bookingId,
+            data: { bookingStatus: "Cancelled" },
+          }).unwrap();
+          Swal.fire("Cancelled", res.message || "Booking cancelled", "success");
+        } catch (err) {
+          Swal.fire("Error", "Failed to cancel booking", "error");
+        }
+      }
+    });
+  };
+
+  // 🔁 Group by eventId and aggregate quantity & totalAmount
+  const groupedBookings = bookings.reduce(
+    (acc: Record<number, BookingDetails>, booking: any) => {
+      const eventId = booking.eventId;
+      const existing = acc[eventId];
+
+      const createdAtStr =
+        typeof booking.createdAt === "string"
+          ? booking.createdAt
+          : new Date(booking.createdAt).toISOString();
+
+      if (existing) {
+        existing.quantity += Number(booking.quantity);
+        existing.totalAmount += Number(booking.totalAmount);
+
+        if (new Date(createdAtStr) > new Date(existing.createdAt)) {
+          existing.bookingStatus = booking.bookingStatus;
+          existing.createdAt = createdAtStr;
+          existing.bookingId = booking.bookingId;
+        }
+      } else {
+        acc[eventId] = {
+          bookingId: booking.bookingId,
+          eventId: booking.eventId,
+          userId: booking.userId ?? booking.user_id,
+          quantity: Number(booking.quantity),
+          totalAmount: Number(booking.totalAmount),
+          bookingStatus: booking.bookingStatus,
+          createdAt: createdAtStr,
+          event: {
+            name: booking.event?.name ?? "",
+            title: booking.event?.title ?? "",
+            date: booking.event?.date ?? "",
+            location: booking.event?.location ?? "",
+            image: booking.event?.image ?? "",
+          },
+        };
+      }
+
+      return acc;
+    },
+    {}
+  );
+
+  const uniqueBookings = Object.values(groupedBookings);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-10">
+        <PuffLoader color="#3b82f6" />
+      </div>
+    );
+  }
+
+  if (error || !bookings) {
+    return <p className="text-red-500 text-center">Failed to load bookings.</p>;
+  }
+
+  if (uniqueBookings.length === 0) {
+    return <p className="text-center text-gray-600">You have no bookings yet.</p>;
+  }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold mb-4">My Bookings</h1>
-      {bookings?.length === 0 && <p>No bookings yet.</p>}
-      {bookings?.map((b) => (
-        <div key={b.bookingId} className="p-4 border rounded shadow">
-          <p><strong>Event:</strong> {b.event?.name}</p>
-          <p><strong>Date:</strong> {b.event?.date}</p>
-          <p><strong>Status:</strong> {b.bookingStatus}</p>
-        </div>
-      ))}
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold text-center text-blue-600 mb-4">My Bookings</h1>
+
+      {uniqueBookings.map((b) => {
+        const imageName = b.event.image?.trim() || "";
+        const validImage =
+          imageName && !imageName.includes("undefined")
+            ? imageName.startsWith("http")
+              ? imageName
+              : `${IMAGE_BASE_URL}/${imageName}`
+            : "/placeholder.png";
+
+        return (
+          <div
+            key={b.eventId}
+            className="p-4 border rounded-lg shadow hover:shadow-md transition bg-white"
+          >
+            <div className="flex items-center gap-4 mb-2">
+              <img
+                src={validImage}
+                alt={b.event.title || "Event Image"}
+                className="w-24 h-24 rounded object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (target.src !== "/placeholder.png") {
+                    target.src = "/placeholder.png";
+                  }
+                }}
+              />
+              <div>
+                <h2 className="text-xl font-semibold">{b.event.title}</h2>
+                <p className="text-sm text-gray-500">{b.event.date}</p>
+                <p className="text-sm text-gray-500">{b.event.location}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p><strong>Booking ID:</strong> {b.bookingId}</p>
+                <p><strong>Tickets:</strong> {b.quantity}</p>
+                <p><strong>Total:</strong> ${b.totalAmount.toFixed(2)}</p>
+              </div>
+              <div>
+                <p>
+                  <strong>Status:</strong>{" "}
+                  <span className={`badge ${getStatusBadge(b.bookingStatus)}`}>
+                    {b.bookingStatus}
+                  </span>
+                </p>
+                <p><strong>Booked on:</strong> {new Date(b.createdAt).toLocaleString()}</p>
+              </div>
+            </div>
+
+            {b.bookingStatus.toLowerCase() !== "cancelled" && (
+              <div className="mt-4">
+                <button
+                  onClick={() => handleCancelBooking(b.bookingId)}
+                  className="btn btn-sm btn-outline text-red-500 hover:bg-red-100"
+                >
+                  <FiEdit className="mr-2" />
+                  Cancel Booking
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

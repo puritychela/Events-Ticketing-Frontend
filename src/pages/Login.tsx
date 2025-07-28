@@ -4,7 +4,6 @@ import { useLoginUserMutation } from "../features/api/userApi";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../features/auth/authSlice";
 import Footer from "../components/Footer";
-// import Navbar from "../components/Navbar";
 import loginImg from "../../src/assets/login.jpg";
 
 export const Login = () => {
@@ -40,9 +39,12 @@ export const Login = () => {
         })
       );
 
-      // ✅ Redirect to correct dashboard
+      // ✅ Redirect based on role
       const destination =
-        response.role === "admin" ? "/AdminDashboard" : "/Dashboard";
+        response.role === "admin"
+          ? "/AdminDashboard/analytics"
+          : "/Dashboard";
+
       navigate(destination);
     } catch (error) {
       console.error("Login error:", error);
@@ -52,7 +54,6 @@ export const Login = () => {
 
   return (
     <>
-      {/* <Navbar /> */}
       <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-white to-pink-100 flex items-center justify-center py-10 px-4 overflow-x-hidden">
         <div className="grid sm:grid-cols-2 w-full max-w-6xl bg-white rounded-3xl overflow-hidden shadow-lg">
           {/* Image Section */}
