@@ -33,6 +33,9 @@ const ManageUsers = () => {
     lastname: "",
     email: "",
     password: "",
+    role: "user",
+    contactPhone: "",
+    address: "",
   });
 
   const openEditModal = (user: User) => {
@@ -43,6 +46,9 @@ const ManageUsers = () => {
       lastname: user.lastname,
       email: user.email,
       password: "",
+      role: user.role,
+      contactPhone: user.contactPhone || "",
+      address: user.address || "",
     });
   };
 
@@ -54,25 +60,43 @@ const ManageUsers = () => {
       lastname: "",
       email: "",
       password: "",
+      role: "user",
+      contactPhone: "",
+      address: "",
     });
   };
 
   const closeModal = () => {
     setEditingUser(null);
     setIsCreating(false);
-    setFormData({ firstname: "", lastname: "", email: "", password: "" });
+    setFormData({
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+      role: "user",
+      contactPhone: "",
+      address: "",
+    });
   };
 
   const handleSave = async () => {
     if (isCreating) {
-      // CREATE NEW USER
-      if (!formData.password) {
+      if (!formData.password.trim()) {
         Swal.fire("Error", "Password is required for new users.", "error");
         return;
       }
 
       try {
-        await registerUser(formData).unwrap();
+        await registerUser({
+          ...formData,
+          firstname: formData.firstname.trim(),
+          lastname: formData.lastname.trim(),
+          email: formData.email.trim(),
+          password: formData.password.trim(),
+          contactPhone: formData.contactPhone.trim(),
+          address: formData.address.trim(),
+        }).unwrap();
         closeModal();
         Swal.fire("Success", "New user created successfully.", "success");
       } catch (error) {
@@ -80,16 +104,27 @@ const ManageUsers = () => {
         Swal.fire("Error", "Failed to create user.", "error");
       }
     } else if (editingUser?.userId) {
-      // UPDATE USER
-      const payload = {
-        firstname: formData.firstname,
-        lastname: formData.lastname,
-        email: formData.email,
-        ...(formData.password && { password: formData.password }),
+      const rawPayload = {
+        firstname: formData.firstname.trim(),
+        lastname: formData.lastname.trim(),
+        email: formData.email.trim(),
+        role: formData.role,
+        contactPhone: formData.contactPhone.trim(),
+        address: formData.address.trim(),
+        ...(formData.password.trim() && { password: formData.password.trim() }),
       };
 
+      const filteredPayload = Object.fromEntries(
+        Object.entries(rawPayload).filter(([_, val]) => val !== "")
+      );
+
+      if (Object.keys(filteredPayload).length === 0) {
+        Swal.fire("Warning", "No changes detected to update.", "warning");
+        return;
+      }
+
       try {
-        await updateUserProfile({ userId: editingUser.userId, data: payload }).unwrap();
+        await updateUserProfile({ userId: editingUser.userId, data: filteredPayload }).unwrap();
         closeModal();
         Swal.fire("Updated!", "User profile updated successfully.", "success");
       } catch (error) {
@@ -183,7 +218,6 @@ const ManageUsers = () => {
         </div>
       )}
 
-      {/* Modal */}
       {(editingUser || isCreating) && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-[90%] max-w-md shadow-md">
@@ -191,46 +225,28 @@ const ManageUsers = () => {
               {isCreating ? "Create New User" : "Edit User"}
             </h2>
 
-            <div className="mb-3">
-              <label className="label">First Name</label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                value={formData.firstname}
-                onChange={(e) => setFormData({ ...formData, firstname: e.target.value })}
-              />
-            </div>
+            {["firstname", "lastname", "email", "contactPhone", "address", "password"].map((field) => (
+              <div className="mb-3" key={field}>
+                <label className="label">{field === "contactPhone" ? "Phone" : field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                <input
+                  type={field === "password" ? "password" : field === "email" ? "email" : "text"}
+                  className="input input-bordered w-full"
+                  value={(formData as any)[field]}
+                  onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+                />
+              </div>
+            ))}
 
             <div className="mb-3">
-              <label className="label">Last Name</label>
-              <input
-                type="text"
+              <label className="label">Role</label>
+              <select
                 className="input input-bordered w-full"
-                value={formData.lastname}
-                onChange={(e) => setFormData({ ...formData, lastname: e.target.value })}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="label">Email</label>
-              <input
-                type="email"
-                className="input input-bordered w-full"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="label">
-                Password <span className="text-xs text-gray-400">(Required for new users)</span>
-              </label>
-              <input
-                type="password"
-                className="input input-bordered w-full"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value as "user" | "admin" })}
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
 
             <div className="flex justify-end gap-3">
